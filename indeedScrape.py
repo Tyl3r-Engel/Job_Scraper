@@ -24,46 +24,50 @@ def getJobs(jobKeyList):
   jobs = []
   for jobKey in jobKeyList:
     soup, url = getIndividualJob(jobKey)
-    info = soup.find('div', class_ = 'jobsearch-ViewJobLayout-jobDisplay')
-    #print(str(info))
-
-    #* Job title
-    jobTitle = info.find('h1', class_ = 'jobsearch-JobInfoHeader-title').text
-
-    #* Company Name
-    companyName = info.find('div', class_ = 'jobsearch-InlineCompanyRating').find('a').text
-
-    #* Details Section
-    detailsSection = [item.text for item in info.find('div', class_ = 'jobsearch-JobDescriptionSection-section').find_all('div', 'jobsearch-JobDescriptionSection-sectionItem')]
-
-    #* Qualifications
+    #* tries to parse job data if any error continues to next job
     try:
-      qualifications = info.find('div', class_ = 'jobsearch-ReqAndQualSection-item--title').text
+      info = soup.find('div', class_ = 'jobsearch-ViewJobLayout-jobDisplay')
+      #print(str(info))
+
+      #* Job title
+      jobTitle = info.find('h1', class_ = 'jobsearch-JobInfoHeader-title').text
+
+      #* Company Name
+      companyName = info.find('div', class_ = 'jobsearch-InlineCompanyRating').find('a').text
+
+      #* Details Section
+      detailsSection = [item.text for item in info.find('div', class_ = 'jobsearch-JobDescriptionSection-section').find_all('div', 'jobsearch-JobDescriptionSection-sectionItem')]
+
+      #* Qualifications
+      try:
+        qualifications = info.find('div', class_ = 'jobsearch-ReqAndQualSection-item--title').text
+      except:
+        qualifications = None
+
+      #* Benefits
+      try:
+        benefits = info.find('div', class_ = 'coinfp-benefits-panel').text
+      except:
+        benefits = None
+
+      #* Description
+      #description = info.find('div', class_ = 'jobsearch-jobDescriptionText')
+      description = str(info.find('div', class_ ='jobsearch-jobDescriptionText').text).strip().replace('\n', '')
+
+      #* Apply link is 'url'
+
+      currentJob = {
+        'jobTitle': jobTitle,
+        'companyName': companyName,
+        'detailsSection': detailsSection,
+        'qualifications': qualifications,
+        'benefits': benefits,
+        'description': description,
+        'url': url
+      }
+      jobs.append(currentJob)
     except:
-      qualifications = None
-
-    #* Benefits
-    try:
-      benefits = info.find('div', class_ = 'coinfp-benefits-panel').text
-    except:
-      benefits = None
-
-    #* Description
-    #description = info.find('div', class_ = 'jobsearch-jobDescriptionText')
-    description = str(info.find('div', class_ ='jobsearch-jobDescriptionText').text).strip().replace('\n', '')
-
-    #* Apply link is 'url'
-
-    currentJob = {
-      'jobTitle': jobTitle,
-      'companyName': companyName,
-      'detailsSection': detailsSection,
-      'qualifications': qualifications,
-      'benefits': benefits,
-      'description': description,
-      'url': url
-    }
-    jobs.append(currentJob)
+      continue
   return jobs
 
 jobList = getJobs(getJobKeys())
