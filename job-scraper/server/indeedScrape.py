@@ -2,10 +2,14 @@ import requests
 import re
 from bs4 import BeautifulSoup
 
+# import sys
+# page, other = sys.argv[1:]
+# print(page, other)
+
 header = {'User-Agent' : 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.3 Safari/605.1.15'}
 
-def getSource():
-    url = 'https://www.indeed.com/jobs?q=software%20engineer&l=remote&start=10'
+def getSource(page = 10):
+    url = f'https://www.indeed.com/jobs?q=software%20engineer&l=remote&start={page}'
     r = requests.get(url, header)
     return r.text
 
